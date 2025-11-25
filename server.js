@@ -15,14 +15,3 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
-```
-
----
-
-## 📄 **ARQUIVO 3: .gitignore**
-**(Criar na RAIZ do repositório)**
-```
-node_modules/
-.env
-.DS_Store
-*.log
