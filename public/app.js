@@ -165,16 +165,13 @@ function TCCEvaluationSystem() {
         return;
       }
 
-      const finalScore = written !== null ? (written + presentation).toFixed(1) : presentation.toFixed(1);
-
       handleSubmitEvaluation({
         evaluatedWritten,
         writtenScore,
-        presentationScore,
-        finalScore
+        presentationScore
       });
 
-      alert(`Avaliação enviada com sucesso! Nota final: ${finalScore}`);
+      alert('Avaliação enviada com sucesso!');
     };
 
     const selectedTCCData = tccList.find(tcc => tcc.id === selectedTCC);
@@ -409,7 +406,14 @@ function TCCEvaluationSystem() {
                         </p>
                         {isCompleted && (
                           <p className="text-sm text-green-600 font-semibold mt-2">
-                            ✓ Avaliação concluída - Nota final: {isCompleted.finalScore}
+                            ✓ Avaliação concluída
+                            {isCompleted.evaluatedWritten === 'yes' && 
+                              ` - Trabalho Escrito: ${isCompleted.writtenScore}`
+                            }
+                            {isCompleted.evaluatedWritten === 'no' && 
+                              ` - Trabalho Escrito: —`
+                            }
+                            {` | Apresentação: ${isCompleted.presentationScore}`}
                           </p>
                         )}
                       </div>
@@ -544,7 +548,5 @@ function TCCEvaluationSystem() {
 
   return null;
 }
-
-ReactDOM.render(<TCCEvaluationSystem />, document.getElementById('root'));
 
 ReactDOM.render(<TCCEvaluationSystem />, document.getElementById('root'));
