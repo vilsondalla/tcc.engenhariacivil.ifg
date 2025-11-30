@@ -29,8 +29,37 @@ function TCCEvaluationSystem() {
   const [professorName, setProfessorName] = useState('');
   const [emailError, setEmailError] = useState('');
   const [selectedTCC, setSelectedTCC] = useState('');
-  const [completedEvaluations, setCompletedEvaluations] = useState({});
+  const [completedEvaluations, setCompletedEvaluations] = useState(() => {
+    const saved = localStorage.getItem('tcc_evaluations');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [showFarewell, setShowFarewell] = useState(false);
+
+  // Salva avaliações no localStorage sempre que mudar
+  React.useEffect(() => {
+    localStorage.setItem('tcc_evaluations', JSON.stringify(completedEvaluations));
+  }, [completedEvaluations]);
+
+  // Salva email e nome no localStorage
+  React.useEffect(() => {
+    if (professorEmail && professorName) {
+      localStorage.setItem('tcc_professor_email', professorEmail);
+      localStorage.setItem('tcc_professor_name', professorName);
+    }
+  }, [professorEmail, professorName]);
+
+  // Recupera dados do localStorage ao carregar
+  React.useEffect(() => {
+    const savedEmail = localStorage.getItem('tcc_professor_email');
+    const savedName = localStorage.getItem('tcc_professor_name');
+    if (savedEmail && savedName) {
+      setProfessorEmail(savedEmail);
+      setProfessorName(savedName);
+      if (currentStep === 'login') {
+        setCurrentStep('selectTCC');
+      }
+    }
+  }, []);
 
   const tccList = [
     { 
@@ -105,17 +134,7 @@ function TCCEvaluationSystem() {
 
   const handleTCCSelection = (tccId) => {
     setSelectedTCC(tccId);
-    
-    // Verifica se já foi avaliado
-    if (completedEvaluations[tccId]) {
-      if (window.confirm('Este TCC já foi avaliado. Deseja editar a nota existente?')) {
-        setCurrentStep('instructions');
-      }
-    } else {
-      if (window.confirm('Deseja iniciar a avaliação deste TCC?')) {
-        setCurrentStep('instructions');
-      }
-    }
+    setCurrentStep('instructions');
   };
 
   const handleSubmitEvaluation = (evaluationData) => {
@@ -135,6 +154,9 @@ function TCCEvaluationSystem() {
   };
 
   const handleResetToLogin = () => {
+    localStorage.removeItem('tcc_evaluations');
+    localStorage.removeItem('tcc_professor_email');
+    localStorage.removeItem('tcc_professor_name');
     setProfessorEmail('');
     setProfessorName('');
     setSelectedTCC('');
@@ -264,6 +286,7 @@ function TCCEvaluationSystem() {
                   </label>
                   <input
                     type="number"
+                    inputMode="decimal"
                     step="0.1"
                     min="0"
                     max="5"
@@ -290,6 +313,7 @@ function TCCEvaluationSystem() {
                 </label>
                 <input
                   type="number"
+                  inputMode="decimal"
                   step="0.1"
                   min="0"
                   max="5"
