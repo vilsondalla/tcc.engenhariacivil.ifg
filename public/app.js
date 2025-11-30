@@ -29,35 +29,44 @@ function TCCEvaluationSystem() {
   const [professorName, setProfessorName] = useState('');
   const [emailError, setEmailError] = useState('');
   const [selectedTCC, setSelectedTCC] = useState('');
-  const [completedEvaluations, setCompletedEvaluations] = useState(() => {
-    const saved = localStorage.getItem('tcc_evaluations');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const [completedEvaluations, setCompletedEvaluations] = useState({});
   const [showFarewell, setShowFarewell] = useState(false);
 
-  // Salva avaliações no localStorage sempre que mudar
+  // Carrega avaliações específicas do email do professor
   React.useEffect(() => {
-    localStorage.setItem('tcc_evaluations', JSON.stringify(completedEvaluations));
-  }, [completedEvaluations]);
+    if (professorEmail) {
+      const saved = localStorage.getItem(`tcc_evaluations_${professorEmail}`);
+      if (saved) {
+        setCompletedEvaluations(JSON.parse(saved));
+      } else {
+        setCompletedEvaluations({});
+      }
+    }
+  }, [professorEmail]);
+
+  // Salva avaliações no localStorage vinculadas ao email
+  React.useEffect(() => {
+    if (professorEmail && Object.keys(completedEvaluations).length > 0) {
+      localStorage.setItem(`tcc_evaluations_${professorEmail}`, JSON.stringify(completedEvaluations));
+    }
+  }, [completedEvaluations, professorEmail]);
 
   // Salva email e nome no localStorage
   React.useEffect(() => {
     if (professorEmail && professorName) {
-      localStorage.setItem('tcc_professor_email', professorEmail);
-      localStorage.setItem('tcc_professor_name', professorName);
+      localStorage.setItem('tcc_last_professor_email', professorEmail);
+      localStorage.setItem('tcc_last_professor_name', professorName);
     }
   }, [professorEmail, professorName]);
 
   // Recupera dados do localStorage ao carregar
   React.useEffect(() => {
-    const savedEmail = localStorage.getItem('tcc_professor_email');
-    const savedName = localStorage.getItem('tcc_professor_name');
-    if (savedEmail && savedName) {
+    const savedEmail = localStorage.getItem('tcc_last_professor_email');
+    const savedName = localStorage.getItem('tcc_last_professor_name');
+    if (savedEmail && savedName && currentStep === 'login') {
       setProfessorEmail(savedEmail);
       setProfessorName(savedName);
-      if (currentStep === 'login') {
-        setCurrentStep('selectTCC');
-      }
+      setCurrentStep('selectTCC');
     }
   }, []);
 
@@ -162,15 +171,15 @@ function TCCEvaluationSystem() {
   };
 
   const handleResetToLogin = () => {
-    // NÃO limpa as avaliações, apenas volta para o login
+    // Remove apenas email e nome do último login, mantém as avaliações
+    localStorage.removeItem('tcc_last_professor_email');
+    localStorage.removeItem('tcc_last_professor_name');
     setProfessorEmail('');
     setProfessorName('');
     setSelectedTCC('');
+    setCompletedEvaluations({});
     setShowFarewell(false);
     setCurrentStep('login');
-    // Remove apenas email e nome, mantém as avaliações
-    localStorage.removeItem('tcc_professor_email');
-    localStorage.removeItem('tcc_professor_name');
   };
 
   // Componente interno para o formulário de avaliação
