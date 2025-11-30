@@ -134,7 +134,15 @@ function TCCEvaluationSystem() {
 
   const handleTCCSelection = (tccId) => {
     setSelectedTCC(tccId);
-    setCurrentStep('instructions');
+    
+    // Verifica se já foi avaliado
+    if (completedEvaluations[tccId]) {
+      if (window.confirm('Este TCC já foi avaliado. Deseja editar a avaliação existente?')) {
+        setCurrentStep('instructions');
+      }
+    } else {
+      setCurrentStep('instructions');
+    }
   };
 
   const handleSubmitEvaluation = (evaluationData) => {
