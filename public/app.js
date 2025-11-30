@@ -146,7 +146,8 @@ function TCCEvaluationSystem() {
     
     // Verifica se já foi avaliado
     if (completedEvaluations[tccId]) {
-      if (window.confirm('Este TCC já foi avaliado. Deseja editar a avaliação existente?')) {
+      const confirmar = window.confirm('Este TCC já foi avaliado. Deseja editar a avaliação existente?\n\nClique em OK para SIM ou Cancelar para NÃO');
+      if (confirmar) {
         setCurrentStep('instructions');
       }
     } else {
@@ -452,13 +453,68 @@ function TCCEvaluationSystem() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Selecione o TCC para avaliar
+          <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6">
+              Instruções para Avaliação de TCC I
             </h1>
-            <p className="text-gray-600 mb-2">
-              Avaliador(a): <span className="font-semibold">{professorName}</span>
-            </p>
+            
+            <div className="mb-6">
+              <p className="text-gray-700 mb-4">
+                Bem-vindo(a), <span className="font-semibold text-green-600">{professorName}</span>!
+              </p>
+              <p className="text-gray-700 mb-4">
+                De acordo com a <strong>Resolução nº 28/2014 do IFG (Art. 22)</strong> e o <strong>Edital do Seminário de Qualificação</strong>, a avaliação do TCC I será composta pela análise da <strong>parte escrita</strong> e da <strong>apresentação oral</strong>.
+              </p>
+            </div>
+
+            <div className="bg-amber-50 border-l-4 border-amber-500 p-6 mb-6">
+              <h2 className="text-xl font-bold text-amber-900 mb-3">
+                Composição das Notas
+              </h2>
+              <p className="text-amber-800 mb-3">
+                <strong>NF = TE + A</strong>
+              </p>
+              <ul className="space-y-2 text-amber-800">
+                <li className="flex items-start">
+                  <span className="text-amber-600 mr-2">•</span>
+                  <span><strong>Trabalho Escrito (TE):</strong> 0 a 5 pontos (média aritmética das notas de dois professores avaliadores)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-amber-600 mr-2">•</span>
+                  <span><strong>Apresentação (A):</strong> 0 a 5 pontos (média aritmética das notas da banca examinadora)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-amber-600 mr-2">•</span>
+                  <span><strong>Nota Final (NF):</strong> 0 a 10 pontos</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-purple-50 border-l-4 border-purple-500 p-6 mb-6">
+              <h2 className="text-lg font-bold text-purple-900 mb-2">
+                Rito do Seminário
+              </h2>
+              <ul className="space-y-2 text-purple-800">
+                <li className="flex items-start">
+                  <span className="text-purple-600 mr-2">•</span>
+                  <span>Discente(s): <strong>15 minutos</strong> para apresentação</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-600 mr-2">•</span>
+                  <span>Arguições: até <strong>30 minutos</strong> (20 min para avaliadores da parte escrita + 10 min para demais membros)</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-purple-600 mr-2">•</span>
+                  <span>A avaliação da apresentação será realizada pelos avaliadores em conjunto com o(a) orientador(a)</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              Selecione o TCC para avaliar
+            </h2>
             <p className="text-sm text-gray-500 mb-8">
               Seminário de Qualificação - 03/12/2025 às 16:30 - Sala 401 - BL300
             </p>
@@ -534,47 +590,15 @@ function TCCEvaluationSystem() {
     );
   }
 
-  // TELA DE INSTRUÇÕES
+  // TELA DE INSTRUÇÕES (CRITÉRIOS)
   if (currentStep === 'instructions') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-6">
-              Instruções para Avaliação de TCC I
+              Critérios de Avaliação
             </h1>
-            
-            <div className="mb-8">
-              <p className="text-gray-700 mb-4">
-                Bem-vindo(a), <span className="font-semibold text-green-600">{professorName}</span>!
-              </p>
-              <p className="text-gray-700 mb-4">
-                De acordo com a <strong>Resolução nº 28/2014 do IFG (Art. 22)</strong> e o <strong>Edital do Seminário de Qualificação</strong>, a avaliação do TCC I será composta pela análise da <strong>parte escrita</strong> e da <strong>apresentação oral</strong>.
-              </p>
-            </div>
-
-            <div className="bg-amber-50 border-l-4 border-amber-500 p-6 mb-6">
-              <h2 className="text-xl font-bold text-amber-900 mb-3">
-                Composição das Notas
-              </h2>
-              <p className="text-amber-800 mb-3">
-                <strong>NF = TE + A</strong>
-              </p>
-              <ul className="space-y-2 text-amber-800">
-                <li className="flex items-start">
-                  <span className="text-amber-600 mr-2">•</span>
-                  <span><strong>Trabalho Escrito (TE):</strong> 0 a 5 pontos (média aritmética das notas de dois professores avaliadores)</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-amber-600 mr-2">•</span>
-                  <span><strong>Apresentação (A):</strong> 0 a 5 pontos (média aritmética das notas da banca examinadora)</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-amber-600 mr-2">•</span>
-                  <span><strong>Nota Final (NF):</strong> 0 a 10 pontos</span>
-                </li>
-              </ul>
-            </div>
 
             <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6">
               <h2 className="text-xl font-bold text-blue-900 mb-4">
@@ -593,7 +617,7 @@ function TCCEvaluationSystem() {
               </ul>
             </div>
 
-            <div className="bg-green-50 border-l-4 border-green-500 p-6 mb-6">
+            <div className="bg-green-50 border-l-4 border-green-500 p-6 mb-8">
               <h2 className="text-xl font-bold text-green-900 mb-4">
                 Critérios de Avaliação - Apresentação e Arguições Orais
               </h2>
@@ -607,26 +631,6 @@ function TCCEvaluationSystem() {
                     <span className="text-green-800">{criterion}</span>
                   </li>
                 ))}
-              </ul>
-            </div>
-
-            <div className="bg-purple-50 border-l-4 border-purple-500 p-6 mb-8">
-              <h2 className="text-lg font-bold text-purple-900 mb-2">
-                Rito do Seminário
-              </h2>
-              <ul className="space-y-2 text-purple-800">
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  <span>Discente(s): <strong>15 minutos</strong> para apresentação</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  <span>Arguições: até <strong>30 minutos</strong> (20 min para avaliadores da parte escrita + 10 min para demais membros)</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  <span>A avaliação da apresentação será realizada pelos avaliadores em conjunto com o(a) orientador(a)</span>
-                </li>
               </ul>
             </div>
 
