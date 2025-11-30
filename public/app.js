@@ -154,15 +154,15 @@ function TCCEvaluationSystem() {
   };
 
   const handleResetToLogin = () => {
-    localStorage.removeItem('tcc_evaluations');
-    localStorage.removeItem('tcc_professor_email');
-    localStorage.removeItem('tcc_professor_name');
+    // NÃO limpa as avaliações, apenas volta para o login
     setProfessorEmail('');
     setProfessorName('');
     setSelectedTCC('');
-    setCompletedEvaluations({});
     setShowFarewell(false);
     setCurrentStep('login');
+    // Remove apenas email e nome, mantém as avaliações
+    localStorage.removeItem('tcc_professor_email');
+    localStorage.removeItem('tcc_professor_name');
   };
 
   // Componente interno para o formulário de avaliação
@@ -178,6 +178,12 @@ function TCCEvaluationSystem() {
     );
 
     const handleSubmit = () => {
+      // Verifica se respondeu sobre a parte escrita
+      if (evaluatedWritten === null) {
+        alert('Por favor, responda se você avaliou a parte escrita do trabalho.');
+        return;
+      }
+      
       if (evaluatedWritten === 'yes' && !writtenScore) {
         alert('Por favor, insira a nota da parte escrita.');
         return;
@@ -188,8 +194,8 @@ function TCCEvaluationSystem() {
         return;
       }
 
-      const written = evaluatedWritten === 'yes' ? parseFloat(writtenScore) : null;
-      const presentation = parseFloat(presentationScore);
+      const written = evaluatedWritten === 'yes' ? parseFloat(writtenScore.replace(',', '.')) : null;
+      const presentation = parseFloat(presentationScore.replace(',', '.'));
 
       if (written !== null && (written < 0 || written > 5)) {
         alert('A nota da parte escrita deve estar entre 0 e 5.');
@@ -203,8 +209,8 @@ function TCCEvaluationSystem() {
 
       handleSubmitEvaluation({
         evaluatedWritten,
-        writtenScore,
-        presentationScore
+        writtenScore: written !== null ? written.toFixed(1) : null,
+        presentationScore: presentation.toFixed(1)
       });
 
       alert('Avaliação enviada com sucesso!');
@@ -285,15 +291,12 @@ function TCCEvaluationSystem() {
                     Nota da Parte Escrita (0 a 5)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     inputMode="decimal"
-                    step="0.1"
-                    min="0"
-                    max="5"
                     value={writtenScore}
                     onChange={(e) => setWrittenScore(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Ex: 4.5"
+                    placeholder="Ex: 4,5 ou 4.5"
                   />
                   <p className="text-sm text-gray-600 mt-2">
                     Considere os 10 critérios apresentados nas instruções (delimitação do objeto, relevância, abordagem, domínio, análise crítica, etc.)
@@ -312,15 +315,12 @@ function TCCEvaluationSystem() {
                   Nota da Apresentação (0 a 5)
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   inputMode="decimal"
-                  step="0.1"
-                  min="0"
-                  max="5"
                   value={presentationScore}
                   onChange={(e) => setPresentationScore(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="Ex: 4.8"
+                  placeholder="Ex: 4,8 ou 4.8"
                 />
                 <p className="text-sm text-gray-600 mt-2">
                   Considere os 8 critérios: controle do tempo, domínio do conteúdo, clareza, adequação das ideias, relevância, viabilidade do cronograma, viabilidade técnica-orçamentária e consistência nas respostas
@@ -432,8 +432,6 @@ function TCCEvaluationSystem() {
 
   // TELA DE SELEÇÃO DE TCC
   if (currentStep === 'selectTCC') {
-    const allEvaluated = tccList.every(tcc => completedEvaluations[tcc.id]);
-    
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
         <div className="max-w-5xl mx-auto">
@@ -502,16 +500,17 @@ function TCCEvaluationSystem() {
               })}
             </div>
 
-            {allEvaluated && (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <button
-                  onClick={handleLogout}
-                  className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  Sair
-                </button>
-              </div>
-            )}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="w-full bg-green-600 text-white py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors text-lg"
+              >
+                Enviar Tudo e Finalizar
+              </button>
+              <p className="text-center text-sm text-gray-500 mt-3">
+                Você pode finalizar mesmo sem avaliar todos os trabalhos
+              </p>
+            </div>
           </div>
         </div>
       </div>
