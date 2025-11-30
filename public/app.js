@@ -30,6 +30,7 @@ function TCCEvaluationSystem() {
   const [emailError, setEmailError] = useState('');
   const [selectedTCC, setSelectedTCC] = useState('');
   const [completedEvaluations, setCompletedEvaluations] = useState({});
+  const [showFarewell, setShowFarewell] = useState(false);
 
   const tccList = [
     { 
@@ -127,6 +128,19 @@ function TCCEvaluationSystem() {
     // Volta para seleção de TCCs
     setCurrentStep('selectTCC');
     setSelectedTCC('');
+  };
+
+  const handleLogout = () => {
+    setShowFarewell(true);
+  };
+
+  const handleResetToLogin = () => {
+    setProfessorEmail('');
+    setProfessorName('');
+    setSelectedTCC('');
+    setCompletedEvaluations({});
+    setShowFarewell(false);
+    setCurrentStep('login');
   };
 
   // Componente interno para o formulário de avaliação
@@ -310,6 +324,40 @@ function TCCEvaluationSystem() {
     );
   };
 
+  // TELA DE DESPEDIDA
+  if (showFarewell) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
+        <div className="max-w-2xl mx-auto mt-20">
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div className="inline-block p-4 bg-green-100 rounded-full mb-6">
+              <CheckCircleIcon />
+            </div>
+            
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              Muito Obrigado!
+            </h1>
+            
+            <p className="text-xl text-gray-700 mb-6">
+              Professor(a) <span className="font-semibold text-green-600">{professorName}</span>,
+            </p>
+            
+            <p className="text-gray-600 mb-8 text-lg">
+              Agradecemos pela sua participação e dedicação na avaliação dos trabalhos de conclusão de curso. Sua contribuição é fundamental para o desenvolvimento acadêmico de nossos alunos.
+            </p>
+            
+            <button
+              onClick={handleResetToLogin}
+              className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+            >
+              Voltar para Tela Inicial
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // TELA DE LOGIN
   if (currentStep === 'login') {
     return (
@@ -360,6 +408,8 @@ function TCCEvaluationSystem() {
 
   // TELA DE SELEÇÃO DE TCC
   if (currentStep === 'selectTCC') {
+    const allEvaluated = tccList.every(tcc => completedEvaluations[tcc.id]);
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-6">
         <div className="max-w-5xl mx-auto">
@@ -427,6 +477,17 @@ function TCCEvaluationSystem() {
                 );
               })}
             </div>
+
+            {allEvaluated && (
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <button
+                  onClick={handleLogout}
+                  className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  Sair
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
