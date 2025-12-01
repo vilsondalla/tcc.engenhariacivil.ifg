@@ -168,7 +168,55 @@ function TCCEvaluationSystem() {
   };
 
   const handleLogout = () => {
-    setShowFarewell(true);
+    // Envia dados para o Google Sheets
+    enviarParaPlanilha();
+  };
+
+  const enviarParaPlanilha = async () => {
+    const scriptURL = 'https://script.google.com/a/macros/ifg.edu.br/s/AKfycbyy6VQORF2p5sFfsS_xdExkVLvpPbxpIq8Kf6bfxSwJvw5wlAWAUS5W7Of1LMHCkEUwEw/exec';
+    
+    // Prepara os dados das avaliações
+    const avaliacoes = [];
+    
+    tccList.forEach(tcc => {
+      if (completedEvaluations[tcc.id]) {
+        const eval = completedEvaluations[tcc.id];
+        avaliacoes.push({
+          tccId: tcc.id,
+          titulo: tcc.title,
+          alunos: tcc.students,
+          orientador: tcc.advisor,
+          avalouEscrita: eval.evaluatedWritten === 'yes' ? 'Sim' : 'Não',
+          notaEscrita: eval.writtenScore || '-',
+          notaApresentacao: eval.presentationScore
+        });
+      }
+    });
+    
+    const dadosEnvio = {
+      email: professorEmail,
+      nome: professorName,
+      avaliacoes: avaliacoes
+    };
+    
+    try {
+      const response = await fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dadosEnvio)
+      });
+      
+      // Com no-cors não conseguimos ler a resposta, mas se não der erro, funcionou
+      console.log('Dados enviados para a planilha!');
+      setShowFarewell(true);
+      
+    } catch (error) {
+      console.error('Erro ao enviar dados:', error);
+      alert('Erro ao enviar dados para a planilha. Por favor, tente novamente.');
+    }
   };
 
   const handleResetToLogin = () => {
