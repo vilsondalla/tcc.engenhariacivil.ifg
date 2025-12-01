@@ -167,15 +167,30 @@ function TCCEvaluationSystem() {
     setSelectedTCC('');
   };
 
-  const handleLogout = () => {
-    // Envia dados para o Google Sheets
-    enviarParaPlanilha();
-  };
+  const tccList = [
+    { 
+      id: 1, 
+      title: 'Análise da resistência mecânica de concretos reforçados externamente com compósitos de fibras de carbono', 
+      students: 'Heloisa Gabriela Evangelista Lopes',
+      advisor: 'Prof. Dr. Roger Otávio Pires Montes'
+    },
+    { 
+      id: 2, 
+      title: 'Aplicação de técnicas compensatórias ao sistema de drenagem no refeitório acadêmico do Instituto Federal de Goiás – Câmpus Uruaçu', 
+      students: 'Joyce Heloísa Braz Nonato, Lara Marielle Lima Rodrigues',
+      advisor: 'Profa. Ma. Raíssa Faria de Araújo'
+    },
+    { 
+      id: 3, 
+      title: 'Travessias urbanas nas rodovias: estudo de caso para a cidade de Uruaçu-GO', 
+      students: 'Kamilla Katrine de Araujo Garcia, Victor Almeida Gomes',
+      advisor: 'Profa. Dra. Juliana de Souza e Silva Arrais'
+    }
+  ];
 
   const enviarParaPlanilha = async () => {
     const scriptURL = 'https://script.google.com/a/macros/ifg.edu.br/s/AKfycbyy6VQORF2p5sFfsS_xdExkVLvpPbxpIq8Kf6bfxSwJvw5wlAWAUS5W7Of1LMHCkEUwEw/exec';
     
-    // Prepara os dados das avaliações
     const avaliacoes = [];
     
     tccList.forEach(tcc => {
@@ -200,7 +215,7 @@ function TCCEvaluationSystem() {
     };
     
     try {
-      const response = await fetch(scriptURL, {
+      await fetch(scriptURL, {
         method: 'POST',
         mode: 'no-cors',
         headers: {
@@ -209,14 +224,17 @@ function TCCEvaluationSystem() {
         body: JSON.stringify(dadosEnvio)
       });
       
-      // Com no-cors não conseguimos ler a resposta, mas se não der erro, funcionou
       console.log('Dados enviados para a planilha!');
       setShowFarewell(true);
       
     } catch (error) {
       console.error('Erro ao enviar dados:', error);
-      alert('Erro ao enviar dados para a planilha. Por favor, tente novamente.');
+      setShowFarewell(true);
     }
+  };
+
+  const handleLogout = () => {
+    enviarParaPlanilha();
   };
 
   const handleResetToLogin = () => {
