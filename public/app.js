@@ -1,7 +1,6 @@
-const { useState } = React;
-const { FileText, User, CheckCircle, AlertCircle } = window.lucideReact || {};
+const { useState, useEffect } = React;
 
-// Ícones inline caso lucide não carregue
+// Ícones inline
 const UserIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
@@ -23,6 +22,60 @@ const CheckCircleIcon = () => (
   </svg>
 );
 
+const AlertCircleIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="8" x2="12" y2="12"></line>
+    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+  </svg>
+);
+
+// Lista de TCCs (ÚNICO LOCAL - CORRIGIDO)
+const tccList = [
+  { 
+    id: 1, 
+    title: 'Análise da resistência mecânica de concretos reforçados externamente com compósitos de fibras de carbono', 
+    students: 'Heloisa Gabriela Evangelista Lopes',
+    advisor: 'Prof. Dr. Roger Otávio Pires Montes'
+  },
+  { 
+    id: 2, 
+    title: 'Aplicação de técnicas compensatórias ao sistema de drenagem no refeitório acadêmico do Instituto Federal de Goiás – Câmpus Uruaçu', 
+    students: 'Joyce Heloísa Braz Nonato, Lara Marielle Lima Rodrigues',
+    advisor: 'Profa. Ma. Raíssa Faria de Araújo'
+  },
+  { 
+    id: 3, 
+    title: 'Travessias urbanas nas rodovias: estudo de caso para a cidade de Uruaçu-GO', 
+    students: 'Kamilla Katrine de Araujo Garcia, Victor Almeida Gomes',
+    advisor: 'Profa. Dra. Juliana de Souza e Silva Arrais'
+  }
+];
+
+const writtenCriteria = [
+  'Delimitação adequada do objeto',
+  'Relevância do desenvolvimento do objeto',
+  'Abordagem adequada do problema objeto da pesquisa',
+  'Domínio do conteúdo',
+  'Abordagem teórica-crítica, analítica e propositiva',
+  'Clareza e objetividade',
+  'Coesão e unidade do trabalho',
+  'Análise interdisciplinar',
+  'Observância dos aspectos formais da língua',
+  'Respeito às diretrizes técnicas e formais definidas pela ABNT'
+];
+
+const presentationCriteria = [
+  'Controle e organização do tempo de apresentação',
+  'Domínio do conteúdo',
+  'Clareza e objetividade',
+  'Adequação das ideias ao discurso',
+  'Relevância da pesquisa',
+  'Viabilidade do cronograma',
+  'Viabilidade técnica-orçamentária',
+  'Consistência das respostas aos questionamentos da banca examinadora'
+];
+
 function TCCEvaluationSystem() {
   const [currentStep, setCurrentStep] = useState('login');
   const [professorEmail, setProfessorEmail] = useState('');
@@ -32,90 +85,61 @@ function TCCEvaluationSystem() {
   const [completedEvaluations, setCompletedEvaluations] = useState({});
   const [showFarewell, setShowFarewell] = useState(false);
 
-  // Carrega avaliações específicas do email do professor
-  React.useEffect(() => {
+  // Carrega avaliações do localStorage ao iniciar
+  useEffect(() => {
     if (professorEmail) {
-      const saved = localStorage.getItem(`tcc_evaluations_${professorEmail}`);
-      if (saved) {
-        setCompletedEvaluations(JSON.parse(saved));
-      } else {
-        setCompletedEvaluations({});
+      try {
+        const saved = localStorage.getItem(`tcc_evaluations_${professorEmail}`);
+        if (saved) {
+          setCompletedEvaluations(JSON.parse(saved));
+        } else {
+          setCompletedEvaluations({});
+        }
+      } catch (error) {
+        console.error('Erro ao carregar avaliações:', error);
       }
     }
   }, [professorEmail]);
 
-  // Salva avaliações no localStorage vinculadas ao email
-  React.useEffect(() => {
+  // Salva avaliações no localStorage
+  useEffect(() => {
     if (professorEmail && Object.keys(completedEvaluations).length > 0) {
-      localStorage.setItem(`tcc_evaluations_${professorEmail}`, JSON.stringify(completedEvaluations));
+      try {
+        localStorage.setItem(`tcc_evaluations_${professorEmail}`, JSON.stringify(completedEvaluations));
+      } catch (error) {
+        console.error('Erro ao salvar avaliações:', error);
+      }
     }
   }, [completedEvaluations, professorEmail]);
 
   // Salva email e nome no localStorage
-  React.useEffect(() => {
+  useEffect(() => {
     if (professorEmail && professorName) {
-      localStorage.setItem('tcc_last_professor_email', professorEmail);
-      localStorage.setItem('tcc_last_professor_name', professorName);
+      try {
+        localStorage.setItem('tcc_last_professor_email', professorEmail);
+        localStorage.setItem('tcc_last_professor_name', professorName);
+      } catch (error) {
+        console.error('Erro ao salvar dados do professor:', error);
+      }
     }
   }, [professorEmail, professorName]);
 
   // Recupera dados do localStorage ao carregar
-  React.useEffect(() => {
-    const savedEmail = localStorage.getItem('tcc_last_professor_email');
-    const savedName = localStorage.getItem('tcc_last_professor_name');
-    if (savedEmail && savedName && currentStep === 'login') {
-      setProfessorEmail(savedEmail);
-      setProfessorName(savedName);
-      setCurrentStep('selectTCC');
+  useEffect(() => {
+    try {
+      const savedEmail = localStorage.getItem('tcc_last_professor_email');
+      const savedName = localStorage.getItem('tcc_last_professor_name');
+      if (savedEmail && savedName && currentStep === 'login') {
+        setProfessorEmail(savedEmail);
+        setProfessorName(savedName);
+        setCurrentStep('selectTCC');
+      }
+    } catch (error) {
+      console.error('Erro ao recuperar dados:', error);
     }
   }, []);
 
-  const tccList = [
-    { 
-      id: 1, 
-      title: 'Análise da resistência mecânica de concretos reforçados externamente com compósitos de fibras de carbono', 
-      students: 'Heloisa Gabriela Evangelista Lopes',
-      advisor: 'Prof. Dr. Roger Otávio Pires Montes'
-    },
-    { 
-      id: 2, 
-      title: 'Aplicação de técnicas compensatórias ao sistema de drenagem no refeitório acadêmico do Instituto Federal de Goiás – Câmpus Uruaçu', 
-      students: 'Joyce Heloísa Braz Nonato, Lara Marielle Lima Rodrigues',
-      advisor: 'Profa. Ma. Raíssa Faria de Araújo'
-    },
-    { 
-      id: 3, 
-      title: 'Travessias urbanas nas rodovias: estudo de caso para a cidade de Uruaçu-GO', 
-      students: 'Kamilla Katrine de Araujo Garcia, Victor Almeida Gomes',
-      advisor: 'Profa. Dra. Juliana de Souza e Silva Arrais'
-    }
-  ];
-
-  const writtenCriteria = [
-    'Delimitação adequada do objeto',
-    'Relevância do desenvolvimento do objeto',
-    'Abordagem adequada do problema objeto da pesquisa',
-    'Domínio do conteúdo',
-    'Abordagem teórica-crítica, analítica e propositiva',
-    'Clareza e objetividade',
-    'Coesão e unidade do trabalho',
-    'Análise interdisciplinar',
-    'Observância dos aspectos formais da língua',
-    'Respeito às diretrizes técnicas e formais definidas pela ABNT'
-  ];
-
-  const presentationCriteria = [
-    'Controle e organização do tempo de apresentação',
-    'Domínio do conteúdo',
-    'Clareza e objetividade',
-    'Adequação das ideias ao discurso',
-    'Relevância da pesquisa',
-    'Viabilidade do cronograma',
-    'Viabilidade técnica-orçamentária',
-    'Consistência das respostas aos questionamentos da banca examinadora'
-  ];
-
-  // Extrai primeiro nome do email e formata
+  // Extrai primeiro nome do email
   const extractFirstName = (email) => {
     const username = email.split('@')[0];
     const firstName = username.split('.')[0];
@@ -138,13 +162,12 @@ function TCCEvaluationSystem() {
 
     const name = extractFirstName(professorEmail);
     setProfessorName(name);
-    setCurrentStep('selectTCC'); // Vai direto para seleção
+    setCurrentStep('selectTCC');
   };
 
   const handleTCCSelection = (tccId) => {
     setSelectedTCC(tccId);
     
-    // Verifica se já foi avaliado
     if (completedEvaluations[tccId]) {
       const confirmar = window.confirm('Este TCC já foi avaliado. Deseja editar a avaliação existente?\n\nClique em OK para SIM ou Cancelar para NÃO');
       if (confirmar) {
@@ -156,40 +179,17 @@ function TCCEvaluationSystem() {
   };
 
   const handleSubmitEvaluation = (evaluationData) => {
-    // Salva avaliação como concluída
     setCompletedEvaluations(prev => ({
       ...prev,
       [selectedTCC]: evaluationData
     }));
     
-    // Volta para seleção de TCCs
     setCurrentStep('selectTCC');
     setSelectedTCC('');
   };
 
-  const tccList = [
-    { 
-      id: 1, 
-      title: 'Análise da resistência mecânica de concretos reforçados externamente com compósitos de fibras de carbono', 
-      students: 'Heloisa Gabriela Evangelista Lopes',
-      advisor: 'Prof. Dr. Roger Otávio Pires Montes'
-    },
-    { 
-      id: 2, 
-      title: 'Aplicação de técnicas compensatórias ao sistema de drenagem no refeitório acadêmico do Instituto Federal de Goiás – Câmpus Uruaçu', 
-      students: 'Joyce Heloísa Braz Nonato, Lara Marielle Lima Rodrigues',
-      advisor: 'Profa. Ma. Raíssa Faria de Araújo'
-    },
-    { 
-      id: 3, 
-      title: 'Travessias urbanas nas rodovias: estudo de caso para a cidade de Uruaçu-GO', 
-      students: 'Kamilla Katrine de Araujo Garcia, Victor Almeida Gomes',
-      advisor: 'Profa. Dra. Juliana de Souza e Silva Arrais'
-    }
-  ];
-
   const enviarParaPlanilha = async () => {
-    const scriptURL = 'https://script.google.com/a/macros/ifg.edu.br/s/AKfycbyy6VQORF2p5sFfsS_xdExkVLvpPbxpIq8Kf6bfxSwJvw5wlAWAUS5W7Of1LMHCkEUwEw/exec';
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyy6VQORF2p5sFfsS_xdExkVLvpPbxpIq8Kf6bfxSwJvw5wlAWAUS5W7Of1LMHCkEUwEw/exec';
     
     const avaliacoes = [];
     
@@ -238,9 +238,12 @@ function TCCEvaluationSystem() {
   };
 
   const handleResetToLogin = () => {
-    // Remove apenas email e nome do último login, mantém as avaliações
-    localStorage.removeItem('tcc_last_professor_email');
-    localStorage.removeItem('tcc_last_professor_name');
+    try {
+      localStorage.removeItem('tcc_last_professor_email');
+      localStorage.removeItem('tcc_last_professor_name');
+    } catch (error) {
+      console.error('Erro ao limpar localStorage:', error);
+    }
     setProfessorEmail('');
     setProfessorName('');
     setSelectedTCC('');
@@ -249,7 +252,7 @@ function TCCEvaluationSystem() {
     setCurrentStep('login');
   };
 
-  // Componente interno para o formulário de avaliação
+  // Componente do formulário de avaliação
   const EvaluationForm = () => {
     const [evaluatedWritten, setEvaluatedWritten] = useState(
       completedEvaluations[selectedTCC]?.evaluatedWritten || null
@@ -262,7 +265,6 @@ function TCCEvaluationSystem() {
     );
 
     const handleSubmit = () => {
-      // Verifica se respondeu sobre a parte escrita
       if (evaluatedWritten === null) {
         alert('Por favor, responda se você avaliou a parte escrita do trabalho.');
         return;
@@ -383,7 +385,7 @@ function TCCEvaluationSystem() {
                     placeholder="Ex: 4,5 ou 4.5"
                   />
                   <p className="text-sm text-gray-600 mt-2">
-                    Considere os 10 critérios apresentados nas instruções (delimitação do objeto, relevância, abordagem, domínio, análise crítica, etc.)
+                    Considere os 10 critérios apresentados nas instruções
                   </p>
                 </div>
               )}
@@ -407,7 +409,7 @@ function TCCEvaluationSystem() {
                   placeholder="Ex: 4,8 ou 4.8"
                 />
                 <p className="text-sm text-gray-600 mt-2">
-                  Considere os 8 critérios: controle do tempo, domínio do conteúdo, clareza, adequação das ideias, relevância, viabilidade do cronograma, viabilidade técnica-orçamentária e consistência nas respostas
+                  Considere os 8 critérios apresentados
                 </p>
               </div>
             </div>
@@ -496,7 +498,7 @@ function TCCEvaluationSystem() {
               />
               {emailError && (
                 <div className="mt-3 flex items-start gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
-                  {AlertCircle && <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />}
+                  <AlertCircleIcon />
                   <span>{emailError}</span>
                 </div>
               )}
@@ -543,11 +545,11 @@ function TCCEvaluationSystem() {
               <ul className="space-y-2 text-amber-800">
                 <li className="flex items-start">
                   <span className="text-amber-600 mr-2">•</span>
-                  <span><strong>Trabalho Escrito (TE):</strong> 0 a 5 pontos (média aritmética das notas de dois professores avaliadores)</span>
+                  <span><strong>Trabalho Escrito (TE):</strong> 0 a 5 pontos</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-amber-600 mr-2">•</span>
-                  <span><strong>Apresentação (A):</strong> 0 a 5 pontos (média aritmética das notas da banca examinadora)</span>
+                  <span><strong>Apresentação (A):</strong> 0 a 5 pontos</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-amber-600 mr-2">•</span>
@@ -567,11 +569,7 @@ function TCCEvaluationSystem() {
                 </li>
                 <li className="flex items-start">
                   <span className="text-purple-600 mr-2">•</span>
-                  <span>Arguições: até <strong>30 minutos</strong> (20 min para avaliadores da parte escrita + 10 min para demais membros)</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  <span>A avaliação da apresentação será realizada pelos avaliadores em conjunto com o(a) orientador(a)</span>
+                  <span>Arguições: até <strong>30 minutos</strong></span>
                 </li>
               </ul>
             </div>
@@ -582,7 +580,7 @@ function TCCEvaluationSystem() {
               Selecione o TCC para avaliar
             </h2>
             <p className="text-sm text-gray-500 mb-8">
-              Seminário de Qualificação - 03/12/2025 às 16:30 - Sala 401 - BL300
+              Seminário de Qualificação - 03/12/2025 às 16:30 - Sala 401
             </p>
 
             <div className="space-y-4 mb-8">
@@ -688,7 +686,7 @@ function TCCEvaluationSystem() {
                 Critérios de Avaliação - Apresentação e Arguições Orais
               </h2>
               <p className="text-green-800 mb-3">
-                Na avaliação da apresentação e das respostas às arguições serão levados em conta:
+                Na avaliação da apresentação serão levados em conta:
               </p>
               <ul className="space-y-2">
                 {presentationCriteria.map((criterion, index) => (
@@ -720,4 +718,5 @@ function TCCEvaluationSystem() {
   return null;
 }
 
+// Renderiza o componente
 ReactDOM.render(<TCCEvaluationSystem />, document.getElementById('root'));
